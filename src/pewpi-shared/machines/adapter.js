@@ -21,12 +21,15 @@ class MachinesAdapter {
     }
 
     try {
+      // Set initialized first so _registerDefaultAdapters can work
+      this.initialized = true;
+      
       // Register default adapters
       this._registerDefaultAdapters();
       
-      this.initialized = true;
       console.log('[MachinesAdapter] Initialized successfully');
     } catch (error) {
+      this.initialized = false;
       console.error('[MachinesAdapter] Initialization failed:', error);
       throw error;
     }
