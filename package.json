@@ -4,7 +4,7 @@
   "description": "Infinity Brain Node 034 (007 Edition) - Distributed Brain Cell",
   "main": "index-shim.js",
   "scripts": {
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
