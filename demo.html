@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pewpi-shared Integration Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #0b0b0b 0%, #1a1a2e 100%);
+      color: #e6e6e6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0;
+      border-bottom: 2px solid #00e5ff;
+      margin-bottom: 40px;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    
+    .highlight {
+      color: #00e5ff;
+    }
+    
+    .subtitle {
+      opacity: 0.8;
+      font-size: 1.2rem;
+    }
+    
+    .demo-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+    
+    .demo-section h2 {
+      color: #00e5ff;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #00e5ff 0%, #0099cc 100%);
+      color: #0b0b0b;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .output {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      max-height: 300px;
+      overflow-y: auto;
+      border-left: 3px solid #00e5ff;
+    }
+    
+    .output pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status.success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .status.error {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .status.pending {
+      background: #ffc107;
+      color: #0b0b0b;
+    }
+    
+    .info-box {
+      background: rgba(0, 229, 255, 0.1);
+      border-left: 4px solid #00e5ff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .card {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+    
+    .card h3 {
+      color: #00e5ff;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>∞ pewpi-<span class="highlight">shared</span></h1>
+      <p class="subtitle">Integration Demo & Testing Interface</p>
+    </header>
+
+    <div class="info-box">
+      <strong>Status:</strong> <span id="init-status" class="status pending">Initializing...</span>
+      <div id="init-details" style="margin-top: 10px; font-size: 0.9rem;"></div>
+    </div>
+
+    <!-- Token Service Demo -->
+    <div class="demo-section">
+      <h2>🔐 Token Service</h2>
+      <div class="button-group">
+        <button onclick="generateToken()">Generate Token</button>
+        <button onclick="validateToken()">Validate Last Token</button>
+        <button onclick="revokeToken()">Revoke Last Token</button>
+        <button onclick="cleanupTokens()">Cleanup Expired</button>
+      </div>
+      <div id="token-output" class="output">
+        <pre>Token operations will appear here...</pre>
+      </div>
+    </div>
+
+    <!-- Auth Service Demo -->
+    <div class="demo-section">
+      <h2>👤 Authentication Service</h2>
+      <div class="button-group">
+        <button onclick="authenticate()">Authenticate User</button>
+        <button onclick="checkAuth()">Check Auth Status</button>
+        <button onclick="getCurrentUser()">Get Current User</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+      <div id="auth-output" class="output">
+        <pre>Authentication operations will appear here...</pre>
+      </div>
+    </div>
+
+    <!-- Wallet Service Demo -->
+    <div class="demo-section">
+      <h2>💰 Wallet Service</h2>
+      <div class="button-group">
+        <button onclick="createWallet()">Create Wallet</button>
+        <button onclick="getUserWallets()">Get My Wallets</button>
+        <button onclick="getDefaultWallet()">Get Default Wallet</button>
+        <button onclick="createTransaction()">Create Transaction</button>
+      </div>
+      <div id="wallet-output" class="output">
+        <pre>Wallet operations will appear here...</pre>
+      </div>
+    </div>
+
+    <!-- Integration Listener Demo -->
+    <div class="demo-section">
+      <h2>📡 Integration Listener</h2>
+      <div class="button-group">
+        <button onclick="registerListener()">Register Listener</button>
+        <button onclick="emitEvent()">Emit Custom Event</button>
+        <button onclick="getEventTypes()">Get Event Types</button>
+        <button onclick="getRecentEvents()">Get Recent Events</button>
+      </div>
+      <div id="listener-output" class="output">
+        <pre>Integration events will appear here...</pre>
+      </div>
+    </div>
+
+    <!-- Machines Adapter Demo -->
+    <div class="demo-section">
+      <h2>🤖 Machines Adapter</h2>
+      <div class="button-group">
+        <button onclick="registerMachine()">Register Machine</button>
+        <button onclick="transitionMachine()">Transition State</button>
+        <button onclick="getMachine()">Get Machine State</button>
+      </div>
+      <div id="machine-output" class="output">
+        <pre>State machine operations will appear here...</pre>
+      </div>
+    </div>
+
+    <!-- UI Shim Demo -->
+    <div class="demo-section">
+      <h2>🎨 UI Shim</h2>
+      <div class="button-group">
+        <button onclick="showToastSuccess()">Toast (Success)</button>
+        <button onclick="showToastError()">Toast (Error)</button>
+        <button onclick="showLoading()">Show Loading</button>
+        <button onclick="createElement()">Create Element</button>
+      </div>
+      <div id="ui-output" class="output">
+        <pre>UI operations will appear here...</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load services -->
+  <script src="src/pewpi-shared/token-service.js"></script>
+  <script src="src/pewpi-shared/auth-service.js"></script>
+  <script src="src/pewpi-shared/wallet-unified.js"></script>
+  <script src="src/pewpi-shared/integration-listener.js"></script>
+  <script src="src/pewpi-shared/machines/adapter.js"></script>
+  <script src="src/pewpi-shared/ui/ui-shim.js"></script>
+  <script src="index-shim.js"></script>
+
+  <script>
+    let lastToken = null;
+    let listenerIds = [];
+    let loadingIndicator = null;
+
+    // Wait for initialization
+    window.pewpiShared.ready.then(() => {
+      const { tokenService, authService, walletService, integrationListener, machinesAdapter, uiShim, errors } = window.pewpiShared;
+      
+      const statusEl = document.getElementById('init-status');
+      const detailsEl = document.getElementById('init-details');
+      
+      if (errors.length === 0) {
+        statusEl.className = 'status success';
+        statusEl.textContent = 'Ready';
+        detailsEl.textContent = 'All services initialized successfully!';
+      } else {
+        statusEl.className = 'status error';
+        statusEl.textContent = 'Partial';
+        detailsEl.textContent = `${errors.length} service(s) failed to initialize. Check console for details.`;
+      }
+
+      // Register a global listener for all events
+      integrationListener.on('*', async (event) => {
+        appendOutput('listener-output', `Event: ${event.type}\nData: ${JSON.stringify(event.data, null, 2)}`);
+      });
+
+      // Register specific event listeners
+      integrationListener.on('auth:login', async (event) => {
+        console.log('User logged in:', event.data);
+      });
+
+      integrationListener.on('wallet:created', async (event) => {
+        console.log('Wallet created:', event.data);
+      });
+    }).catch(error => {
+      const statusEl = document.getElementById('init-status');
+      const detailsEl = document.getElementById('init-details');
+      statusEl.className = 'status error';
+      statusEl.textContent = 'Failed';
+      detailsEl.textContent = `Initialization failed: ${error.message}`;
+    });
+
+    function appendOutput(elementId, text) {
+      const el = document.getElementById(elementId);
+      const timestamp = new Date().toLocaleTimeString();
+      el.innerHTML = `<pre>[${timestamp}] ${text}</pre>` + el.innerHTML;
+    }
+
+    // Token Service Functions
+    function generateToken() {
+      const { tokenService } = window.pewpiShared;
+      try {
+        lastToken = tokenService.generate('demo', {
+          purpose: 'testing',
+          expiresAt: Date.now() + 3600000
+        });
+        appendOutput('token-output', `Token generated:\n${JSON.stringify(lastToken, null, 2)}`);
+      } catch (error) {
+        appendOutput('token-output', `Error: ${error.message}`);
+      }
+    }
+
+    function validateToken() {
+      const { tokenService } = window.pewpiShared;
+      try {
+        if (!lastToken) {
+          appendOutput('token-output', 'No token to validate. Generate one first.');
+          return;
+        }
+        const isValid = tokenService.validate(lastToken.id);
+        appendOutput('token-output', `Token ${lastToken.id} is ${isValid ? 'VALID' : 'INVALID'}`);
+      } catch (error) {
+        appendOutput('token-output', `Error: ${error.message}`);
+      }
+    }
+
+    function revokeToken() {
+      const { tokenService } = window.pewpiShared;
+      try {
+        if (!lastToken) {
+          appendOutput('token-output', 'No token to revoke. Generate one first.');
+          return;
+        }
+        const revoked = tokenService.revoke(lastToken.id);
+        appendOutput('token-output', `Token ${lastToken.id} ${revoked ? 'REVOKED' : 'NOT FOUND'}`);
+      } catch (error) {
+        appendOutput('token-output', `Error: ${error.message}`);
+      }
+    }
+
+    function cleanupTokens() {
+      const { tokenService } = window.pewpiShared;
+      try {
+        const cleaned = tokenService.cleanup();
+        appendOutput('token-output', `Cleaned ${cleaned} expired tokens`);
+      } catch (error) {
+        appendOutput('token-output', `Error: ${error.message}`);
+      }
+    }
+
+    // Auth Service Functions
+    async function authenticate() {
+      const { authService } = window.pewpiShared;
+      try {
+        const result = await authService.authenticate({
+          username: 'agent007',
+          role: 'user'
+        });
+        appendOutput('auth-output', `Authenticated:\n${JSON.stringify(result, null, 2)}`);
+      } catch (error) {
+        appendOutput('auth-output', `Error: ${error.message}`);
+      }
+    }
+
+    function checkAuth() {
+      const { authService } = window.pewpiShared;
+      try {
+        const isAuth = authService.isAuthenticated();
+        appendOutput('auth-output', `Authentication status: ${isAuth ? 'AUTHENTICATED' : 'NOT AUTHENTICATED'}`);
+      } catch (error) {
+        appendOutput('auth-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getCurrentUser() {
+      const { authService } = window.pewpiShared;
+      try {
+        const user = authService.getCurrentUser();
+        appendOutput('auth-output', user ? `Current user:\n${JSON.stringify(user, null, 2)}` : 'No user authenticated');
+      } catch (error) {
+        appendOutput('auth-output', `Error: ${error.message}`);
+      }
+    }
+
+    async function logout() {
+      const { authService } = window.pewpiShared;
+      try {
+        await authService.logout();
+        appendOutput('auth-output', 'User logged out');
+      } catch (error) {
+        appendOutput('auth-output', `Error: ${error.message}`);
+      }
+    }
+
+    // Wallet Service Functions
+    async function createWallet() {
+      const { walletService } = window.pewpiShared;
+      try {
+        const wallet = await walletService.createWallet({
+          type: 'ethereum',
+          name: 'Demo Wallet ' + Date.now()
+        });
+        appendOutput('wallet-output', `Wallet created:\n${JSON.stringify(wallet, null, 2)}`);
+      } catch (error) {
+        appendOutput('wallet-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getUserWallets() {
+      const { walletService } = window.pewpiShared;
+      try {
+        const wallets = walletService.getUserWallets();
+        appendOutput('wallet-output', `User wallets (${wallets.length}):\n${JSON.stringify(wallets, null, 2)}`);
+      } catch (error) {
+        appendOutput('wallet-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getDefaultWallet() {
+      const { walletService } = window.pewpiShared;
+      try {
+        const wallet = walletService.getDefaultWallet();
+        appendOutput('wallet-output', wallet ? `Default wallet:\n${JSON.stringify(wallet, null, 2)}` : 'No default wallet set');
+      } catch (error) {
+        appendOutput('wallet-output', `Error: ${error.message}`);
+      }
+    }
+
+    async function createTransaction() {
+      const { walletService } = window.pewpiShared;
+      try {
+        const wallet = walletService.getDefaultWallet();
+        if (!wallet) {
+          appendOutput('wallet-output', 'No wallet available. Create one first.');
+          return;
+        }
+        
+        // Set some balance for demo
+        walletService.updateBalance(wallet.id, 10);
+        
+        const tx = await walletService.createTransaction({
+          fromWalletId: wallet.id,
+          toAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+          amount: 0.5,
+          type: 'transfer'
+        });
+        appendOutput('wallet-output', `Transaction created:\n${JSON.stringify(tx, null, 2)}`);
+      } catch (error) {
+        appendOutput('wallet-output', `Error: ${error.message}`);
+      }
+    }
+
+    // Integration Listener Functions
+    function registerListener() {
+      const { integrationListener } = window.pewpiShared;
+      try {
+        const listenerId = integrationListener.on('custom:event', async (event) => {
+          appendOutput('listener-output', `Custom event received:\n${JSON.stringify(event, null, 2)}`);
+        });
+        listenerIds.push(listenerId);
+        appendOutput('listener-output', `Listener registered: ${listenerId}`);
+      } catch (error) {
+        appendOutput('listener-output', `Error: ${error.message}`);
+      }
+    }
+
+    async function emitEvent() {
+      const { integrationListener } = window.pewpiShared;
+      try {
+        await integrationListener.emit('custom:event', {
+          message: 'Hello from demo!',
+          timestamp: Date.now()
+        });
+        appendOutput('listener-output', 'Custom event emitted');
+      } catch (error) {
+        appendOutput('listener-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getEventTypes() {
+      const { integrationListener } = window.pewpiShared;
+      try {
+        const types = integrationListener.getEventTypes();
+        appendOutput('listener-output', `Event types:\n${JSON.stringify(types, null, 2)}`);
+      } catch (error) {
+        appendOutput('listener-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getRecentEvents() {
+      const { integrationListener } = window.pewpiShared;
+      try {
+        const events = integrationListener.getRecentEvents(5);
+        appendOutput('listener-output', `Recent events:\n${JSON.stringify(events, null, 2)}`);
+      } catch (error) {
+        appendOutput('listener-output', `Error: ${error.message}`);
+      }
+    }
+
+    // Machines Adapter Functions
+    function registerMachine() {
+      const { machinesAdapter } = window.pewpiShared;
+      try {
+        const machine = machinesAdapter.registerMachine('demo-flow', {
+          initialState: 'idle',
+          states: {
+            idle: {},
+            processing: {},
+            completed: {}
+          },
+          transitions: {
+            idle: { start: 'processing' },
+            processing: { complete: 'completed' }
+          }
+        });
+        appendOutput('machine-output', `Machine registered:\n${JSON.stringify(machine, null, 2)}`);
+      } catch (error) {
+        appendOutput('machine-output', `Error: ${error.message}`);
+      }
+    }
+
+    function transitionMachine() {
+      const { machinesAdapter } = window.pewpiShared;
+      try {
+        const machine = machinesAdapter.getMachine('demo-flow');
+        if (!machine) {
+          appendOutput('machine-output', 'Machine not found. Register one first.');
+          return;
+        }
+        
+        const event = machine.state === 'idle' ? 'start' : 'complete';
+        const result = machinesAdapter.transition('demo-flow', event);
+        appendOutput('machine-output', `Transition result:\n${JSON.stringify(result, null, 2)}`);
+      } catch (error) {
+        appendOutput('machine-output', `Error: ${error.message}`);
+      }
+    }
+
+    function getMachine() {
+      const { machinesAdapter } = window.pewpiShared;
+      try {
+        const machine = machinesAdapter.getMachine('demo-flow');
+        appendOutput('machine-output', machine ? `Machine state:\n${JSON.stringify(machine, null, 2)}` : 'Machine not found');
+      } catch (error) {
+        appendOutput('machine-output', `Error: ${error.message}`);
+      }
+    }
+
+    // UI Shim Functions
+    function showToastSuccess() {
+      const { uiShim } = window.pewpiShared;
+      try {
+        uiShim.toast('Operation successful!', {
+          type: 'success',
+          duration: 3000,
+          position: 'bottom-right'
+        });
+        appendOutput('ui-output', 'Success toast displayed');
+      } catch (error) {
+        appendOutput('ui-output', `Error: ${error.message}`);
+      }
+    }
+
+    function showToastError() {
+      const { uiShim } = window.pewpiShared;
+      try {
+        uiShim.toast('Something went wrong!', {
+          type: 'error',
+          duration: 3000,
+          position: 'bottom-right'
+        });
+        appendOutput('ui-output', 'Error toast displayed');
+      } catch (error) {
+        appendOutput('ui-output', `Error: ${error.message}`);
+      }
+    }
+
+    function showLoading() {
+      const { uiShim } = window.pewpiShared;
+      try {
+        if (loadingIndicator) {
+          loadingIndicator.hide();
+          loadingIndicator = null;
+          appendOutput('ui-output', 'Loading indicator hidden');
+        } else {
+          loadingIndicator = uiShim.showLoading('Processing...');
+          appendOutput('ui-output', 'Loading indicator shown (click again to hide)');
+        }
+      } catch (error) {
+        appendOutput('ui-output', `Error: ${error.message}`);
+      }
+    }
+
+    function createElement() {
+      const { uiShim } = window.pewpiShared;
+      try {
+        const element = uiShim.create('div', {
+          className: 'demo-element',
+          style: {
+            background: 'rgba(0, 229, 255, 0.2)',
+            padding: '10px',
+            borderRadius: '4px',
+            marginTop: '10px'
+          }
+        }, `Dynamic element created at ${new Date().toLocaleTimeString()}`);
+        
+        document.getElementById('ui-output').appendChild(element);
+        appendOutput('ui-output', 'Dynamic element created and appended');
+      } catch (error) {
+        appendOutput('ui-output', `Error: ${error.message}`);
+      }
+    }
+  </script>
+</body>
+</html>
